@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Financeiro Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="./logofinantec.png" type="image/x-icon">
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="./logofinantec.png" alt="FinTec Logo" class="logo-img">
+            <span class="logo-text">FinTec <span class="pro">Pro</span></span>
+        </div>
+        
+        <div class="controls">
+            <input type="month" id="monthSelector">
+            <div class="actions">
+                <button onclick="app.downloadData()" class="btn-outline">Download Dados</button>
+                <label for="uploadFile" class="btn-outline">Carregar Arquivo</label>
+                <input type="file" id="uploadFile" accept=".json" onchange="app.uploadData(this)" hidden>
+                <button onclick="app.saveLocal()" class="btn-save">Salvar Local</button>
+            </div>
+
+            <div class="settings">
+                <label class="theme-label">Tema</label>
+                <label class="switch">
+                    <input type="checkbox" id="themeToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <div class="summary-bar">
+        <div class="card-summary income">
+            <span>Total Entradas</span>
+            <h3 id="totalIncome">R$ 0,00</h3>
+        </div>
+        <div class="card-summary expense">
+            <span>Total Saídas</span>
+            <h3 id="totalExpense">R$ 0,00</h3>
+        </div>
+        <div class="card-summary invest">
+            <span>Total Investido</span>
+            <h3 id="totalInvest">R$ 0,00</h3>
+        </div>
+        <div class="card-summary balance">
+            <span>Saldo Restante</span>
+            <h3 id="finalBalance">R$ 0,00</h3>
+        </div>
+    </div>
+
+    <main class="dashboard-grid">
+        
+        <main class="dashboard-grid">
+        
+        <section class="chart-area">
+            <div class="chart-header">
+                <h2>Análise Financeira</h2>
+            </div>
+            <div class="charts-wrapper">
+                <div class="chart-box">
+                    <h3>Fluxo de Caixa</h3>
+                    <div class="canvas-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-box">
+                    <h3>Distribuição (%)</h3>
+                    <div class="canvas-container">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel panel-income">
+            <div class="panel-header">
+                <h3>Entradas</h3>
+                <small>Salários, presentes, extras</small>
+            </div>
+            <div class="input-group-grid">
+                <input type="text" id="incName" placeholder="Nome (ex: Salário)">
+                <input type="number" id="incValue" placeholder="Valor">
+                <input type="color" id="incItemColor" title="Cor da Entrada" value="#04d361">
+                <button onclick="app.addTransaction('incomes')">Adicionar</button>
+            </div>
+            <ul id="list-incomes" class="transaction-list"></ul>
+        </section>
+
+        <section class="panel panel-expenses">
+            <div class="panel-header">
+                <h3>Contas a Pagar</h3>
+                <small>Despesas fixas e variáveis</small>
+            </div>
+            <div class="input-group-grid">
+                <input type="text" id="expName" placeholder="Nome">
+                <input type="number" id="expPlanned" placeholder="Planejado">
+                <input type="number" id="expValue" placeholder="Valor Real">
+                <input type="date" id="expDate">
+                <input type="color" id="expItemColor" title="Cor da Despesa" value="#e83f5b">
+                <button onclick="app.addTransaction('expenses')">Adicionar</button>
+            </div>
+            <ul id="list-expenses" class="transaction-list"></ul>
+        </section>
+
+        <section class="panel panel-invest">
+            <div class="panel-header">
+                <h3>Reservas & Investimentos</h3>
+                <small>Longo prazo e emergência</small>
+            </div>
+            <div class="input-group-grid">
+                <input type="text" id="invName" placeholder="Nome">
+                <select id="invType">
+                    <option value="Reserva">Reserva</option>
+                    <option value="Ações">Ações</option>
+                    <option value="FIIs">FIIs</option>
+                    <option value="Renda Fixa">Renda Fixa</option>
+                </select>
+                <input type="number" id="invValue" placeholder="Valor">
+                <input type="date" id="invDate">
+                <input type="color" id="invItemColor" title="Cor do Investimento" value="#8257e6">
+                <button onclick="app.addTransaction('investments')">Investir</button>
+            </div>
+            <ul id="list-investments" class="transaction-list"></ul>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
