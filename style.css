@@ -239,6 +239,7 @@ input[type="month"], input, select {
     width: calc(100% - 2rem);
     margin: 0 auto;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* Chart Area */
@@ -253,6 +254,9 @@ input[type="month"], input, select {
     flex-direction: column;
     box-shadow: 0 6px 18px rgba(2,6,23,0.35);
     margin-bottom: 1.5rem;
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .chart-header {
@@ -274,6 +278,8 @@ input[type="month"], input, select {
     flex: 1;
     min-height: 420px;
     padding-bottom: 1rem;
+    width: 100%;
+    overflow: hidden;
 }
 
 .chart-box {
@@ -283,6 +289,8 @@ input[type="month"], input, select {
     align-items: center;
     justify-content: flex-start;
     min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .chart-box h3 {
@@ -299,6 +307,8 @@ input[type="month"], input, select {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    max-width: 100%;
 }
 
 .panel {
