@@ -14,12 +14,22 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
-html, body { min-height: 100vh; }
+html { 
+    width: 100%; 
+    overflow-x: hidden; 
+}
+
+html, body { 
+    min-height: 100vh; 
+    width: 100%;
+}
 body { 
     background-color: var(--bg-dark); 
     color: var(--text); 
     padding-bottom: 2rem;
     transition: background-color 0.2s, color 0.2s;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 /* Header & Controls */
@@ -31,6 +41,9 @@ header {
     padding: 1.5rem 2rem; 
     border-bottom: 1px solid var(--border);
     gap: 1rem;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
 }
 .settings {
     display: flex;
@@ -191,6 +204,9 @@ input[type="month"], input, select {
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     padding: 2vh 2rem;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
 }
 .card-summary {
     background: var(--bg-panel);
@@ -217,7 +233,11 @@ input[type="month"], input, select {
         "chart chart chart"
         "income expenses invest";
     grid-template-columns: 1fr 1.2fr 1fr;
-    gap: 2rem; padding: 0 2rem;
+    gap: 2rem; 
+    padding: 0 2rem;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
 }
 
 /* Chart Area */
@@ -541,6 +561,9 @@ body.light-theme {
         align-items: flex-start;
         padding: 1rem;
         gap: 0.8rem;
+        width: 100%;
+        max-width: 100vw;
+        box-sizing: border-box;
     }
 
     .logo {
@@ -551,11 +574,13 @@ body.light-theme {
         flex-direction: column;
         width: 100%;
         gap: 0.8rem;
+        max-width: 100%;
     }
 
     .actions {
         width: 100%;
         gap: 0.3rem;
+        max-width: 100%;
     }
 
     button, .btn-outline {
@@ -571,6 +596,8 @@ body.light-theme {
     .settings {
         width: 100%;
         justify-content: space-between;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .color-pickers {
@@ -608,6 +635,8 @@ body.light-theme {
         grid-template-columns: 1fr 1fr;
         gap: 0.8rem;
         padding: 1rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .card-summary {
@@ -627,6 +656,8 @@ body.light-theme {
     .dashboard-grid {
         padding: 0 1rem;
         gap: 1.2rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .chart-area {
@@ -754,6 +785,9 @@ body.light-theme {
     header {
         padding: 0.8rem;
         gap: 0.5rem;
+        width: 100%;
+        max-width: 100vw;
+        box-sizing: border-box;
     }
 
     .logo {
@@ -795,6 +829,8 @@ body.light-theme {
         grid-template-columns: 1fr;
         gap: 0.6rem;
         padding: 0.8rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .card-summary {
@@ -812,6 +848,8 @@ body.light-theme {
     .dashboard-grid {
         padding: 0 0.8rem;
         gap: 0.6rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .chart-area {
