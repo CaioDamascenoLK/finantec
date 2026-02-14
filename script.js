@@ -12,8 +12,18 @@ let pieChartInstance = null
 // Configuração e Inicialização dos Gráficos
 const initCharts = (root = document) => {
     // Localiza canvases do mobile quando disponíveis, senão usa os de desktop
-    const barEl = (root.getElementById && root.getElementById('barChartMobile')) || document.getElementById('barChart')
-    const pieEl = (root.getElementById && root.getElementById('pieChartMobile')) || document.getElementById('pieChart')
+    let barEl, pieEl
+    
+    if (root === document) {
+        // Desktop: try desktop IDs first, fallback to mobile
+        barEl = document.getElementById('barChart') || document.getElementById('barChartMobile')
+        pieEl = document.getElementById('pieChart') || document.getElementById('pieChartMobile')
+    } else {
+        // Mobile: search within the provided element (e.g., tabAnalytics)
+        barEl = root.querySelector('#barChartMobile') || root.querySelector('#barChart')
+        pieEl = root.querySelector('#pieChartMobile') || root.querySelector('#pieChart')
+    }
+    
     if (!barEl || !pieEl) return
     // 1. Gráfico de Barras
     const ctxBar = barEl.getContext('2d')
@@ -715,6 +725,8 @@ const app = {
             setTimeout(() => {
                 if (barChartInstance) barChartInstance.resize()
                 if (pieChartInstance) pieChartInstance.resize()
+                // Render data into the newly created charts
+                app.render()
             }, 100)
         }
     },
