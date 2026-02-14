@@ -39,12 +39,17 @@ header {
     justify-content: space-between; 
     align-items: center;
     flex-wrap: wrap;
-    padding: 1.5rem 1rem; 
+    padding: 1.25rem 1.5rem; 
     border-bottom: 1px solid var(--border);
     gap: 1rem;
-    width: calc(100% - 2rem);
+    width: min(1280px, 100%);
     margin: 0 auto;
     box-sizing: border-box;
+    backdrop-filter: saturate(140%) blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg-panel);
 }
 .settings {
     display: flex;
@@ -168,12 +173,12 @@ header {
 }
 
 button, .btn-outline {
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
     cursor: pointer;
     border: none;
     font-size: 0.9rem;
-    transition: 0.2s;
+    transition: 0.2s, transform .06s ease;
     text-decoration: none;
     display: inline-block;
     text-align: center;
@@ -181,7 +186,7 @@ button, .btn-outline {
 }
 .btn-outline {
     background: transparent;
-    border: 1px solid var(--primary);
+    border: 1px solid rgba(130,87,230,0.5);
     color: var(--primary);
 }
 .btn-save {
@@ -189,7 +194,7 @@ button, .btn-outline {
     color: #fff;
     font-weight: bold;
 }
-button:hover, .btn-outline:hover { opacity: 0.8; }
+button:hover, .btn-outline:hover { opacity: 0.95; transform: translateY(-1px); }
 
 input[type="month"], input, select {
     background: var(--bg-dark);
@@ -206,23 +211,27 @@ input[type="month"], input, select {
     grid-template-columns: repeat(4, 1fr);
     gap: 0.8rem;
     padding: 1.5vh 1rem;
-    width: calc(100% - 2rem);
+    width: min(1280px, 100%);
     margin: 0 auto;
     box-sizing: border-box;
 }
 .card-summary {
-    background: var(--bg-panel);
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.35);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+    padding: 1.1rem 1.2rem;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 26px rgba(2,6,23,0.35);
+    transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease;
 }
+.card-summary:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(2,6,23,0.45); border-color: rgba(130,87,230,0.35); }
 .card-summary span {
     color: var(--text-sec);
     font-size: 0.9rem;
 }
 .card-summary h3 {
-    font-size: 1.8rem;
-    margin-top: 0.5rem;
+    font-size: 2rem;
+    margin-top: 0.35rem;
+    letter-spacing: -0.3px;
 }
 .income h3 { color: var(--color-income); }
 .expense h3 { color: var(--color-expense); }
@@ -230,8 +239,8 @@ input[type="month"], input, select {
 
 /* Main Grid Layout */
 .dashboard-grid {
-    padding: 1.5rem 1rem;
-    width: calc(100% - 2rem);
+    padding: 1.75rem 1.5rem;
+    width: min(1280px, 100%);
     margin: 0 auto;
     box-sizing: border-box;
 }
@@ -242,8 +251,8 @@ input[type="month"], input, select {
     grid-template-areas: 
         "chart chart chart"
         "income expenses invest";
-    grid-template-columns: 1fr 1.2fr 1fr;
-    gap: 1.5rem;
+    grid-template-columns: 1fr 1.25fr 1fr;
+    gap: 1.75rem;
 }
 
 @media (max-width: 768px) {
@@ -256,13 +265,13 @@ input[type="month"], input, select {
 #desktopContent .chart-area {
     grid-area: chart;
     background: var(--bg-panel);
-    padding: 1.5rem; 
-    border-radius: 8px; 
+    padding: 1.75rem; 
+    border-radius: 14px; 
     height: auto;
     min-height: 70vh;
     display: flex; 
     flex-direction: column;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.35);
+    box-shadow: 0 14px 32px rgba(2,6,23,0.45);
     margin-bottom: 0;
 }
 
@@ -293,7 +302,7 @@ input[type="month"], input, select {
     display: flex;
     justify-content: space-around;
     align-items: flex-start;
-    gap: 1.5rem;
+    gap: 1.75rem;
     flex: 1;
     min-height: 420px;
     padding-bottom: 1rem;
@@ -329,13 +338,14 @@ input[type="month"], input, select {
 
 .panel {
     background: var(--bg-panel);
-    padding: 1.5rem;
-    border-radius: 8px;
+    padding: 1.4rem 1.25rem;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     min-height: 30vh;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.35);
+    box-shadow: 0 10px 26px rgba(2,6,23,0.35);
+    border: 1px solid var(--border);
 }
 
 .panel-income {
@@ -535,6 +545,12 @@ input[type="month"], input, select {
     background: var(--color-invest);
     color: white;
     padding: 0.5rem 1rem;
+}
+
+/* Desktop-only finetuning for very large screens */
+@media (min-width: 1400px) {
+  header, .summary-bar, .dashboard-grid { width: 1320px; }
+  .card-summary h3 { font-size: 2.2rem; }
 }
 
 /* Light theme */

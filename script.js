@@ -5,9 +5,146 @@ const state = {
     editingItem: null // { type: 'incomes'|'expenses'|'investments', id: itemId }
 }
 
+// Lock orientation to portrait on mobile devices
+const lockOrientation = () => {
+    if (window.innerWidth < 768) { // Mobile
+        // Try using the Screen Orientation API
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('portrait-primary').catch(err => {
+                console.log('Orientation lock not supported:', err)
+            })
+        }
+        // Fallback: Listen for orientation change and lock if attempted
+        window.addEventListener('orientationchange', () => {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait-primary').catch(err => {
+                    console.log('Orientation lock failed:', err)
+                })
+            }
+        })
+    }
+}
+
+// Initialize orientation lock when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', lockOrientation)
+} else {
+    lockOrientation()
+}
+
 // Variáveis para as instâncias dos gráficos
 let barChartInstance = null
 let pieChartInstance = null
+
+// Notificações de despesas (2 dias antes do vencimento)
+const notificationManager = {
+    shownNotifications: {},
+    
+    requestPermission: () => {
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission()
+        }
+    },
+    
+    checkUpcomingExpenses: (expenses) => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        
+        expenses.forEach(expense => {
+            if (!expense.date) return
+            
+            // Parse date (YYYY-MM-DD format)
+            const expenseDate = new Date(expense.date)
+            expenseDate.setHours(0, 0, 0, 0)
+            
+            // Calculate days until due date
+            const timeDiff = expenseDate - today
+            const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24))
+            
+            // If exactly 2 days before the due date
+            if (daysDiff === 2) {
+                const notificationKey = `${expense.id}-${expense.date}`
+                
+                // Only show notification once per date
+                if (!notificationManager.shownNotifications[notificationKey]) {
+                    notificationManager.shownNotifications[notificationKey] = true
+                    notificationManager.showNotification(expense)
+                }
+            }
+        })
+    },
+    
+    showNotification: (expense) => {
+        // Show browser notification if permitted
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Lembrete de Despesa', {
+                body: `Sua despesa "${expense.name}" vence em 2 dias (${expense.date}). Já foi paga?`,
+                icon: './logofinantec.png',
+                badge: './logofinantec.png',
+                tag: `expense-${expense.id}`,
+                requireInteraction: false
+            })
+        }
+        
+        // Also show an in-app toast notification
+        notificationManager.showToast(expense)
+    },
+    
+    showToast: (expense) => {
+        // Create toast container if doesn't exist
+        let toastContainer = document.getElementById('notificationToast')
+        if (!toastContainer) {
+            toastContainer = document.createElement('div')
+            toastContainer.id = 'notificationToast'
+            toastContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #8257e6;
+                color: #fff;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                font-family: 'Segoe UI', sans-serif;
+                font-size: 14px;
+                max-width: 350px;
+                animation: slideIn 0.3s ease-in;
+            `
+            document.body.appendChild(toastContainer)
+        }
+        
+        const message = document.createElement('div')
+        message.innerHTML = `
+            <strong>Lembrete:</strong> Sua despesa "<strong>${expense.name}</strong>" vence em 2 dias (${expense.date}). Já foi paga?
+        `
+        toastContainer.innerHTML = ''
+        toastContainer.appendChild(message)
+        
+        // Auto-hide after 8 seconds
+        setTimeout(() => {
+            if (toastContainer.parentElement) {
+                toastContainer.remove()
+            }
+        }, 8000)
+    }
+}
+
+// Add animation for toast
+const style = document.createElement('style')
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+`
+document.head.appendChild(style)
 
 // Configuração e Inicialização dos Gráficos
 const initCharts = (root = document) => {
@@ -216,6 +353,9 @@ const app = {
         initCharts()
         applyColorsToUI(state.data._settings.colors)
         updateChartsColors(state.data._settings.colors)
+
+        // Request notification permission
+        notificationManager.requestPermission()
 
         // Wire optional header color pickers (may be absent)
         const incColor = document.getElementById('incomeColor')
@@ -475,6 +615,9 @@ const app = {
     render: () => {
         app.ensureMonthExists()
         const currentData = state.data[state.currentMonth]
+        
+        // Check for upcoming expenses (2 days before due date)
+        notificationManager.checkUpcomingExpenses(currentData.expenses)
         
         // Cálculos
         const totalInc = currentData.incomes.reduce((acc, item) => acc + item.value, 0)
