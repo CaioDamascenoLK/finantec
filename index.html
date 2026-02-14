@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Financeiro Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="./logofinantec.png" type="image/x-icon">
 </head>
@@ -13,8 +14,9 @@
     <header>
         <div class="logo">
             <img src="./logofinantec.png" alt="FinTec Logo" class="logo-img">
-            <span class="logo-text">FinTec <span class="pro">Pro</span></span>
+            <span class="logo-text">Finantec <span class="pro">PRO</span></span>
         </div>
+        <div class="mobile-greeting mobile-only">Olá <span class="accent">usuário!</span></div>
         
         <div class="controls">
             <input type="month" id="monthSelector">
@@ -55,78 +57,252 @@
     </div>
 
     <main class="dashboard-grid">
-        <section class="chart-area">
-            <div class="chart-header">
-                <h2>Análise Financeira</h2>
-            </div>
-            <div class="charts-wrapper">
-                <div class="chart-box">
-                    <h3>Fluxo de Caixa</h3>
-                    <div class="canvas-container">
-                        <canvas id="barChart"></canvas>
+        <!-- DESKTOP VERSION - Always visible on desktop -->
+        <div id="desktopContent" class="desktop-only">
+            <section class="chart-area">
+                <div class="chart-header">
+                    <h2>Análise Financeira</h2>
+                </div>
+                <div class="charts-wrapper">
+                    <div class="chart-box">
+                        <h3>Fluxo de Caixa</h3>
+                        <div class="canvas-container">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-box">
+                        <h3>Distribuição (%)</h3>
+                        <div class="canvas-container">
+                            <canvas id="pieChart"></canvas>
+                        </div>
                     </div>
                 </div>
-                <div class="chart-box">
-                    <h3>Distribuição (%)</h3>
-                    <div class="canvas-container">
-                        <canvas id="pieChart"></canvas>
-                    </div>
+            </section>
+
+            <section class="panel panel-income">
+                <div class="panel-header">
+                    <h3>Entradas</h3>
+                    <small>Salários, presentes, extras</small>
+                </div>
+                <div class="input-group-grid">
+                    <input type="text" id="incName" placeholder="Nome (ex: Salário)">
+                    <input type="number" id="incValue" placeholder="Valor">
+                    <input type="color" id="incItemColor" title="Cor da Entrada" value="#04d361">
+                    <button onclick="app.addTransaction('incomes')">Adicionar</button>
+                </div>
+                <ul id="list-incomes" class="transaction-list"></ul>
+            </section>
+
+            <section class="panel panel-expenses">
+                <div class="panel-header">
+                    <h3>Contas a Pagar</h3>
+                    <small>Despesas fixas e variáveis</small>
+                </div>
+                <div class="input-group-grid">
+                    <input type="text" id="expName" placeholder="Nome">
+                    <input type="number" id="expPlanned" placeholder="Planejado">
+                    <input type="number" id="expValue" placeholder="Valor Real">
+                    <input type="date" id="expDate">
+                    <input type="color" id="expItemColor" title="Cor da Despesa" value="#e83f5b">
+                    <button onclick="app.addTransaction('expenses')">Adicionar</button>
+                </div>
+                <ul id="list-expenses" class="transaction-list"></ul>
+            </section>
+
+            <section class="panel panel-invest">
+                <div class="panel-header">
+                    <h3>Reservas & Investimentos</h3>
+                    <small>Longo prazo e emergência</small>
+                </div>
+                <div class="input-group-grid">
+                    <input type="text" id="invName" placeholder="Nome">
+                    <select id="invType">
+                        <option value="Reserva">Reserva</option>
+                        <option value="Ações">Ações</option>
+                        <option value="FIIs">FIIs</option>
+                        <option value="Renda Fixa">Renda Fixa</option>
+                    </select>
+                    <input type="number" id="invValue" placeholder="Valor">
+                    <input type="date" id="invDate">
+                    <input type="color" id="invItemColor" title="Cor do Investimento" value="#8257e6">
+                    <button onclick="app.addTransaction('investments')">Investir</button>
+                </div>
+                <ul id="list-investments" class="transaction-list"></ul>
+            </section>
+        </div>
+
+        <!-- MOBILE VERSION - Tab based navigation -->
+        <!-- HOME TAB -->
+        <div id="tabHome" class="tab-content active mobile-only">
+            <div class="mobile-hero mobile-only">
+                <img src="purplecharacter.png" alt="Personagem" class="hero-illustration">
+                <p class="hero-tagline">Controle suas finanças como um <span class="pro">PRO!</span></p>
+            </div>
+            <div class="summary-bar-mobile">
+                <div class="card-summary income">
+                    <span>Total Entradas</span>
+                    <h3 id="totalIncomeMobile">R$ 0,00</h3>
+                </div>
+                <div class="card-summary expense">
+                    <span>Total Saídas</span>
+                    <h3 id="totalExpenseMobile">R$ 0,00</h3>
+                </div>
+                <div class="card-summary invest">
+                    <span>Total Investido</span>
+                    <h3 id="totalInvestMobile">R$ 0,00</h3>
+                </div>
+                <div class="card-summary balance">
+                    <span>Saldo Restante</span>
+                    <h3 id="finalBalanceMobile">R$ 0,00</h3>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section class="panel panel-income">
-            <div class="panel-header">
-                <h3>Entradas</h3>
-                <small>Salários, presentes, extras</small>
-            </div>
-            <div class="input-group-grid">
-                <input type="text" id="incName" placeholder="Nome (ex: Salário)">
-                <input type="number" id="incValue" placeholder="Valor">
-                <input type="color" id="incItemColor" title="Cor da Entrada" value="#04d361">
-                <button onclick="app.addTransaction('incomes')">Adicionar</button>
-            </div>
-            <ul id="list-incomes" class="transaction-list"></ul>
-        </section>
+        <!-- ANALYTICS TAB -->
+        <div id="tabAnalytics" class="tab-content mobile-only">
+            <section class="chart-area">
+                <div class="chart-header">
+                    <h2>Análise Financeira</h2>
+                </div>
+                <div class="charts-wrapper">
+                    <div class="chart-box">
+                        <h3>Fluxo de Caixa</h3>
+                        <div class="canvas-container">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-box">
+                        <h3>Distribuição (%)</h3>
+                        <div class="canvas-container">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
 
-        <section class="panel panel-expenses">
-            <div class="panel-header">
-                <h3>Contas a Pagar</h3>
-                <small>Despesas fixas e variáveis</small>
-            </div>
-            <div class="input-group-grid">
-                <input type="text" id="expName" placeholder="Nome">
-                <input type="number" id="expPlanned" placeholder="Planejado">
-                <input type="number" id="expValue" placeholder="Valor Real">
-                <input type="date" id="expDate">
-                <input type="color" id="expItemColor" title="Cor da Despesa" value="#e83f5b">
-                <button onclick="app.addTransaction('expenses')">Adicionar</button>
-            </div>
-            <ul id="list-expenses" class="transaction-list"></ul>
-        </section>
+        <!-- ADD DATA TAB -->
+        <div id="tabAddData" class="tab-content mobile-only">
+            <section class="panel panel-income">
+                <div class="panel-header">
+                    <h3>Entradas</h3>
+                    <small>Salários, presentes, extras</small>
+                </div>
+                <div class="input-group-grid">
+                    <input type="text" id="incNameMobile" placeholder="Nome (ex: Salário)">
+                    <input type="number" id="incValueMobile" placeholder="Valor">
+                    <input type="color" id="incItemColorMobile" title="Cor da Entrada" value="#04d361">
+                    <button onclick="app.addTransaction('incomes', true)">Adicionar</button>
+                </div>
+                <ul id="list-incomesMobile" class="transaction-list"></ul>
+            </section>
 
-        <section class="panel panel-invest">
-            <div class="panel-header">
-                <h3>Reservas & Investimentos</h3>
-                <small>Longo prazo e emergência</small>
-            </div>
-            <div class="input-group-grid">
-                <input type="text" id="invName" placeholder="Nome">
-                <select id="invType">
-                    <option value="Reserva">Reserva</option>
-                    <option value="Ações">Ações</option>
-                    <option value="FIIs">FIIs</option>
-                    <option value="Renda Fixa">Renda Fixa</option>
-                </select>
-                <input type="number" id="invValue" placeholder="Valor">
-                <input type="date" id="invDate">
-                <input type="color" id="invItemColor" title="Cor do Investimento" value="#8257e6">
-                <button onclick="app.addTransaction('investments')">Investir</button>
-            </div>
-            <ul id="list-investments" class="transaction-list"></ul>
-        </section>
+            <section class="panel panel-expenses">
+                <div class="panel-header">
+                    <h3>Contas a Pagar</h3>
+                    <small>Despesas fixas e variáveis</small>
+                </div>
+                <div class="input-group-grid">
+                    <input type="text" id="expNameMobile" placeholder="Nome">
+                    <input type="number" id="expPlannedMobile" placeholder="Planejado">
+                    <input type="number" id="expValueMobile" placeholder="Valor Real">
+                    <input type="date" id="expDateMobile">
+                    <input type="color" id="expItemColorMobile" title="Cor da Despesa" value="#e83f5b">
+                    <button onclick="app.addTransaction('expenses', true)">Adicionar</button>
+                </div>
+                <ul id="list-expensesMobile" class="transaction-list"></ul>
+            </section>
+
+            <section class="panel panel-invest">
+                <div class="panel-header">
+                    <h3>Reservas & Investimentos</h3>
+                    <small>Longo prazo e emergência</small>
+                </div>
+                <div class="input-group-grid">
+                    <input type="text" id="invNameMobile" placeholder="Nome">
+                    <select id="invTypeMobile">
+                        <option value="Reserva">Reserva</option>
+                        <option value="Ações">Ações</option>
+                        <option value="FIIs">FIIs</option>
+                        <option value="Renda Fixa">Renda Fixa</option>
+                    </select>
+                    <input type="number" id="invValueMobile" placeholder="Valor">
+                    <input type="date" id="invDateMobile">
+                    <input type="color" id="invItemColorMobile" title="Cor do Investimento" value="#8257e6">
+                    <button onclick="app.addTransaction('investments', true)">Investir</button>
+                </div>
+                <ul id="list-investmentsMobile" class="transaction-list"></ul>
+            </section>
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div id="tabSettings" class="tab-content mobile-only">
+            <section class="panel panel-settings">
+                <div class="panel-header">
+                    <h3>Configurações</h3>
+                    <small>Personalize sua experiência</small>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label>Modo Escuro</label>
+                            <small>Ativa o tema escuro</small>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="themeToggleMobile">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label>Exportar Dados</label>
+                            <small>Baixe seus dados em JSON</small>
+                        </div>
+                        <button onclick="app.downloadData()" class="btn-setting">Exportar</button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label>Importar Dados</label>
+                            <small>Carregue um arquivo anterior</small>
+                        </div>
+                        <label for="uploadFileMobile" class="btn-setting">Importar</label>
+                        <input type="file" id="uploadFileMobile" accept=".json" onchange="app.uploadData(this)" hidden>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label>Salvar Local</label>
+                            <small>Salve os dados no navegador</small>
+                        </div>
+                        <button onclick="app.saveLocal()" class="btn-setting">Salvar</button>
+                    </div>
+                </div>
+            </section>
+        </div>
 
     </main>
+
+    <!-- BOTTOM NAVIGATION - Mobile only -->
+    <nav class="bottom-nav mobile-only">
+        <button class="nav-btn active" onclick="app.switchTab('home')" title="Início">
+            <i class="fas fa-home"></i>
+            <span>Início</span>
+        </button>
+        <button class="nav-btn" onclick="app.switchTab('analytics')" title="Análise">
+            <i class="fas fa-chart-bar"></i>
+            <span>Análise</span>
+        </button>
+        <button class="nav-btn" onclick="app.switchTab('adddata')" title="Adicionar Dados">
+            <i class="fas fa-plus-circle"></i>
+            <span>Adicionar</span>
+        </button>
+        <button class="nav-btn" onclick="app.switchTab('settings')" title="Configurações">
+            <i class="fas fa-cog"></i>
+            <span>Config</span>
+        </button>
+    </nav>
 
     <script src="script.js"></script>
 </body>

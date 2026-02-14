@@ -234,6 +234,7 @@ const app = {
 
         // Theme toggle (guarded)
         const themeToggle = document.getElementById('themeToggle')
+        const themeToggleMobile = document.getElementById('themeToggleMobile')
         const body = document.body
         if (themeToggle) {
             themeToggle.checked = state.data._settings.theme === 'light'
@@ -243,12 +244,25 @@ const app = {
                 state.data._settings.theme = e.target.checked ? 'light' : 'dark'
                 if (e.target.checked) body.classList.add('light-theme')
                 else body.classList.remove('light-theme')
+                if (themeToggleMobile) themeToggleMobile.checked = e.target.checked
                 app.saveLocal(true)
             })
         } else {
             // Apply stored theme even when toggle control missing
             if (state.data._settings.theme === 'light') body.classList.add('light-theme')
             else body.classList.remove('light-theme')
+        }
+
+        // Mobile theme toggle
+        if (themeToggleMobile) {
+            themeToggleMobile.checked = state.data._settings.theme === 'light'
+            themeToggleMobile.addEventListener('change', (e) => {
+                state.data._settings.theme = e.target.checked ? 'light' : 'dark'
+                if (e.target.checked) body.classList.add('light-theme')
+                else body.classList.remove('light-theme')
+                if (themeToggle) themeToggle.checked = e.target.checked
+                app.saveLocal(true)
+            })
         }
 
         app.render()
@@ -320,57 +334,60 @@ const app = {
         reader.readAsText(file)
     },
 
-    addTransaction: (type) => {
+    addTransaction: (type, isMobile = false) => {
         app.ensureMonthExists()
         const monthData = state.data[state.currentMonth]
         let newItem = null
 
+        // Define IDs based on mobile or desktop
+        const suffix = isMobile ? 'Mobile' : ''
+        
         if (type === 'incomes') {
-            const name = document.getElementById('incName').value
-            const val = parseFloat(document.getElementById('incValue').value)
-            const color = document.getElementById('incItemColor') ? document.getElementById('incItemColor').value : (state.data._settings.colors.income)
+            const name = document.getElementById(`incName${suffix}`).value
+            const val = parseFloat(document.getElementById(`incValue${suffix}`).value)
+            const color = document.getElementById(`incItemColor${suffix}`) ? document.getElementById(`incItemColor${suffix}`).value : (state.data._settings.colors.income)
             if (!name || isNaN(val)) return alert('Dados inválidos')
 
             newItem = { id: Date.now(), name, value: val, color }
             monthData.incomes.push(newItem)
 
-            document.getElementById('incName').value = ''
-            document.getElementById('incValue').value = ''
-            if (document.getElementById('incItemColor')) document.getElementById('incItemColor').value = state.data._settings.colors.income
+            document.getElementById(`incName${suffix}`).value = ''
+            document.getElementById(`incValue${suffix}`).value = ''
+            if (document.getElementById(`incItemColor${suffix}`)) document.getElementById(`incItemColor${suffix}`).value = state.data._settings.colors.income
         }
         else if (type === 'expenses') {
-            const name = document.getElementById('expName').value
-            const planned = parseFloat(document.getElementById('expPlanned').value) || 0
-            const val = parseFloat(document.getElementById('expValue').value)
-            const date = document.getElementById('expDate').value
-            const color = document.getElementById('expItemColor') ? document.getElementById('expItemColor').value : (state.data._settings.colors.expense)
+            const name = document.getElementById(`expName${suffix}`).value
+            const planned = parseFloat(document.getElementById(`expPlanned${suffix}`).value) || 0
+            const val = parseFloat(document.getElementById(`expValue${suffix}`).value)
+            const date = document.getElementById(`expDate${suffix}`).value
+            const color = document.getElementById(`expItemColor${suffix}`) ? document.getElementById(`expItemColor${suffix}`).value : (state.data._settings.colors.expense)
 
             if (!name || isNaN(val)) return alert('Dados inválidos. Preencha Nome e Valor Real.')
 
             newItem = { id: Date.now(), name, planned, value: val, date, color }
             monthData.expenses.push(newItem)
 
-            document.getElementById('expName').value = ''
-            document.getElementById('expPlanned').value = ''
-            document.getElementById('expValue').value = ''
-            document.getElementById('expDate').value = '' // Limpa a data também
-            if (document.getElementById('expItemColor')) document.getElementById('expItemColor').value = state.data._settings.colors.expense
+            document.getElementById(`expName${suffix}`).value = ''
+            document.getElementById(`expPlanned${suffix}`).value = ''
+            document.getElementById(`expValue${suffix}`).value = ''
+            document.getElementById(`expDate${suffix}`).value = '' // Limpa a data também
+            if (document.getElementById(`expItemColor${suffix}`)) document.getElementById(`expItemColor${suffix}`).value = state.data._settings.colors.expense
         }
         else if (type === 'investments') {
-            const name = document.getElementById('invName').value
-            const typeInv = document.getElementById('invType').value
-            const val = parseFloat(document.getElementById('invValue').value)
-            const date = document.getElementById('invDate').value
-            const color = document.getElementById('invItemColor') ? document.getElementById('invItemColor').value : (state.data._settings.colors.invest)
+            const name = document.getElementById(`invName${suffix}`).value
+            const typeInv = document.getElementById(`invType${suffix}`).value
+            const val = parseFloat(document.getElementById(`invValue${suffix}`).value)
+            const date = document.getElementById(`invDate${suffix}`).value
+            const color = document.getElementById(`invItemColor${suffix}`) ? document.getElementById(`invItemColor${suffix}`).value : (state.data._settings.colors.invest)
 
             if (!name || isNaN(val)) return alert('Dados inválidos')
 
             newItem = { id: Date.now(), name, type: typeInv, value: val, date, color }
             monthData.investments.push(newItem)
 
-            document.getElementById('invName').value = ''
-            document.getElementById('invValue').value = ''
-            if (document.getElementById('invItemColor')) document.getElementById('invItemColor').value = state.data._settings.colors.invest
+            document.getElementById(`invName${suffix}`).value = ''
+            document.getElementById(`invValue${suffix}`).value = ''
+            if (document.getElementById(`invItemColor${suffix}`)) document.getElementById(`invItemColor${suffix}`).value = state.data._settings.colors.invest
         }
 
         app.render()
@@ -451,13 +468,28 @@ const app = {
         const totalInv = currentData.investments.reduce((acc, item) => acc + item.value, 0)
         const balance = totalInc - (totalExp + totalInv)
 
-        // Atualizar DOM (Totais)
+        // Update state summary
+        state.summary = {
+            totalIncome: totalInc,
+            totalExpense: totalExp,
+            totalInvest: totalInv,
+            balance: balance
+        }
+
+        // Atualizar DOM (Totais) - Desktop
         document.getElementById('totalIncome').innerText = app.formatCurrency(totalInc)
         document.getElementById('totalExpense').innerText = app.formatCurrency(totalExp)
         document.getElementById('totalInvest').innerText = app.formatCurrency(totalInv)
         const balElem = document.getElementById('finalBalance')
         balElem.innerText = app.formatCurrency(balance)
         balElem.style.color = balance >= 0 ? '#04d361' : '#e83f5b'
+
+        // Atualizar DOM (Totais) - Mobile
+        const balElemMobile = document.getElementById('finalBalanceMobile')
+        if (balElemMobile) {
+            balElemMobile.innerText = app.formatCurrency(balance)
+            balElemMobile.style.color = balance >= 0 ? '#04d361' : '#e83f5b'
+        }
 
         // Renderizar Listas
         const renderList = (elId, list, type) => {
@@ -557,6 +589,17 @@ const app = {
         renderList('list-expenses', currentData.expenses, 'expenses')
         renderList('list-investments', currentData.investments, 'investments')
 
+        // Render mobile versions of lists
+        if (document.getElementById('list-incomesMobile')) {
+            renderList('list-incomesMobile', currentData.incomes, 'incomes')
+        }
+        if (document.getElementById('list-expensesMobile')) {
+            renderList('list-expensesMobile', currentData.expenses, 'expenses')
+        }
+        if (document.getElementById('list-investmentsMobile')) {
+            renderList('list-investmentsMobile', currentData.investments, 'investments')
+        }
+
         // Atualização dos Gráficos
         if (barChartInstance) {
             barChartInstance.data.datasets[0].data = [totalInc, totalExp, totalInv]
@@ -621,6 +664,68 @@ const app = {
 
         // Autosave without alert
         app.saveLocal(true)
+    },
+
+    // Switch between tabs
+    switchTab: function(tabName) {
+        // Hide all tabs
+        const allTabs = document.querySelectorAll('.tab-content')
+        allTabs.forEach(tab => tab.classList.remove('active'))
+
+        // Remove active class from all nav buttons
+        const allNavBtns = document.querySelectorAll('.nav-btn')
+        allNavBtns.forEach(btn => btn.classList.remove('active'))
+
+        // Show selected tab
+        const tabMap = {
+            'home': 'tabHome',
+            'analytics': 'tabAnalytics',
+            'adddata': 'tabAddData',
+            'settings': 'tabSettings'
+        }
+        const tabId = tabMap[tabName]
+        const selectedTab = document.getElementById(tabId)
+        if (selectedTab) {
+            selectedTab.classList.add('active')
+        }
+
+        // Set active button
+        const navBtns = document.querySelectorAll('.nav-btn')
+        const tabIndex = Object.keys(tabMap).indexOf(tabName)
+        if (navBtns[tabIndex]) {
+            navBtns[tabIndex].classList.add('active')
+        }
+
+        // Redraw charts if analytics tab is active
+        if (tabName === 'analytics') {
+            setTimeout(() => {
+                if (barChartInstance) barChartInstance.resize()
+                if (pieChartInstance) pieChartInstance.resize()
+            }, 100)
+        }
+    },
+
+    // Update all summary displays (desktop and mobile)
+    updateAllSummaries: function() {
+        const totalIncome = document.getElementById('totalIncome')
+        const totalExpense = document.getElementById('totalExpense')
+        const totalInvest = document.getElementById('totalInvest')
+        const finalBalance = document.getElementById('finalBalance')
+
+        const totalIncomeMobile = document.getElementById('totalIncomeMobile')
+        const totalExpenseMobile = document.getElementById('totalExpenseMobile')
+        const totalInvestMobile = document.getElementById('totalInvestMobile')
+        const finalBalanceMobile = document.getElementById('finalBalanceMobile')
+
+        if (totalIncome) totalIncome.textContent = `R$ ${state.summary.totalIncome.toFixed(2).replace(/\./g, ',')}`
+        if (totalExpense) totalExpense.textContent = `R$ ${state.summary.totalExpense.toFixed(2).replace(/\./g, ',')}`
+        if (totalInvest) totalInvest.textContent = `R$ ${state.summary.totalInvest.toFixed(2).replace(/\./g, ',')}`
+        if (finalBalance) finalBalance.textContent = `R$ ${state.summary.balance.toFixed(2).replace(/\./g, ',')}`
+
+        if (totalIncomeMobile) totalIncomeMobile.textContent = `R$ ${state.summary.totalIncome.toFixed(2).replace(/\./g, ',')}`
+        if (totalExpenseMobile) totalExpenseMobile.textContent = `R$ ${state.summary.totalExpense.toFixed(2).replace(/\./g, ',')}`
+        if (totalInvestMobile) totalInvestMobile.textContent = `R$ ${state.summary.totalInvest.toFixed(2).replace(/\./g, ',')}`
+        if (finalBalanceMobile) finalBalanceMobile.textContent = `R$ ${state.summary.balance.toFixed(2).replace(/\./g, ',')}`
     }
 }
 
