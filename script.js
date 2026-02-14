@@ -485,7 +485,13 @@ const app = {
         balElem.style.color = balance >= 0 ? '#04d361' : '#e83f5b'
 
         // Atualizar DOM (Totais) - Mobile
+        const incElemMobile = document.getElementById('totalIncomeMobile')
+        const expElemMobile = document.getElementById('totalExpenseMobile')
+        const invElemMobile = document.getElementById('totalInvestMobile')
         const balElemMobile = document.getElementById('finalBalanceMobile')
+        if (incElemMobile) incElemMobile.innerText = app.formatCurrency(totalInc)
+        if (expElemMobile) expElemMobile.innerText = app.formatCurrency(totalExp)
+        if (invElemMobile) invElemMobile.innerText = app.formatCurrency(totalInv)
         if (balElemMobile) {
             balElemMobile.innerText = app.formatCurrency(balance)
             balElemMobile.style.color = balance >= 0 ? '#04d361' : '#e83f5b'
