@@ -10,9 +10,13 @@ let barChartInstance = null
 let pieChartInstance = null
 
 // Configuração e Inicialização dos Gráficos
-const initCharts = () => {
+const initCharts = (root = document) => {
+    // Localiza canvases do mobile quando disponíveis, senão usa os de desktop
+    const barEl = (root.getElementById && root.getElementById('barChartMobile')) || document.getElementById('barChart')
+    const pieEl = (root.getElementById && root.getElementById('pieChartMobile')) || document.getElementById('pieChart')
+    if (!barEl || !pieEl) return
     // 1. Gráfico de Barras
-    const ctxBar = document.getElementById('barChart').getContext('2d')
+    const ctxBar = barEl.getContext('2d')
     barChartInstance = new Chart(ctxBar, {
         type: 'bar',
         data: {
@@ -49,7 +53,7 @@ const initCharts = () => {
     })
 
     // 2. Gráfico de Pizza
-    const ctxPie = document.getElementById('pieChart').getContext('2d')
+    const ctxPie = pieEl.getContext('2d')
     pieChartInstance = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
@@ -702,8 +706,12 @@ const app = {
             navBtns[tabIndex].classList.add('active')
         }
 
-        // Redraw charts if analytics tab is active
+        // No mobile, recria os gráficos ao abrir a aba de Analytics para calcular tamanho correto
         if (tabName === 'analytics') {
+            try { if (barChartInstance) { barChartInstance.destroy(); barChartInstance = null } } catch(e){}
+            try { if (pieChartInstance) { pieChartInstance.destroy(); pieChartInstance = null } } catch(e){}
+            const analyticsRoot = document.getElementById('tabAnalytics') || document
+            initCharts(analyticsRoot)
             setTimeout(() => {
                 if (barChartInstance) barChartInstance.resize()
                 if (pieChartInstance) pieChartInstance.resize()
